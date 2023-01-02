@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="underscore.js"></script>
+    <script src="vue.js"></script>
+    <link rel="stylesheet" href="bootstrap.css">
+    <link rel="stylesheet" href="flows.css">
+    <title>Flows</title>
+  </head>
+  <body>
+    <div id="app" class="container">
+    	<h1>Flows</h1>
+    	<button v-on:click="hideOptions = !hideOptions">{{hideOptions ? 'Show' : 'Hide'}} Options</button>
+    	<button v-on:click="hideScenarios = !hideScenarios">{{hideScenarios ? 'Show' : 'Hide'}} Scenarios</button>
+    	<table class="container-fluid">
+    		<tr class="row" v-if="!hideOptions">
+    			<td class="col">
+			    	<table>
+			    		<tr><td>Ticks</td><td><input type="number" v-model="maxTicks"></td></tr>
+			    		<tr><td>Interval</td><td><input type="number" v-model="interval"></td></tr>
+			    		<tbody v-for="(p, index) in processes">
+				    		<tr><td>P{{index}}C</td><td><input type="number" v-model="p.capacity"></td></tr>
+				    		<tr><td>P{{index}}E</td><td><input type="number" v-model="p.variance"></td></tr>
+			    		</tbody>
+			    	</table>
+    			</td>
+    			<td class="col">
+    				<p><button v-on:click="clearLogs">Clear Logs</button></p>
+    				<p>Logs:</p>
+    				<div class="logsArea">
+    				<div v-for="log in sortedLogs">{{ log.timestamp }}: {{  log.message  }}</div>
+    				</div>
+    			</td>
+    		</tr>
+    		<tr class="row" v-if="!hideScenarios">
+    			<td class="col">
+    				<button v-for="scenario in scenarios" v-on:click="chooseScenario(scenario)">{{scenario.name}}</button>
+    			</td>
+    		</tr>
+    		<tr>
+    			<td>
+			    	<button v-on:click="start">Play</button>
+		    		<button v-on:click="stop">Stop</button>
+		    		<span>Current tick: {{ currentTick }}</span>
+			    	<table class="table">
+			    		<tr class="row">
+			    			<td class="col">Provider Raw Material Costs</td>
+			    			<td class="col red">{{ -providerMaterialPrice | toCurrency }} per item</td>
+			    			<td class="col red">{{ -finances.providerCosts | toCurrency }}</td>
+			    		</tr>
+			    		<tr class="row">
+			    			<td class="col">Inventory Storage Costs</td>
+			    			<td class="col red">{{ -inventoryStorageCosts | toCurrency }} per item</td>
+			    			<td class="col red">{{ -finances.inventoryStorageCosts | toCurrency }}</td>
+		    			</tr>
+			    		<tr class="row">
+			    			<td class="col">Operational Costs</td>
+			    			<td class="col red">{{ -operationalCosts | toCurrency }} per process per tick</td>
+			    			<td class="col red">{{ -finances.operationalCosts | toCurrency }}</td>
+		    			</tr>
+			    		<tr class="row">
+			    			<td class="col">Sells</td>
+			    			<td class="col green">{{ -endProductPrice | toCurrency }} per item</td>
+			    			<td class="col green">{{ finances.sells | toCurrency }}</td>
+		    			</tr>
+			    		<tr class="row">
+			    			<td class="col">Profit</td>
+			    			<td class="col"></td>
+			    			<td class="col" :class="profitStyle()">{{ profit | toCurrency }}</td>
+			    		</tr>
+			    	</table>
+    				<table class="table factory">
+						<tr class="row">
+							<td class="col">Inventory</td>
+							<td class="col">Process</td>
+							<td class="col">Average Inventory</td>
+						</tr>
+    					<tbody v-for="(process, index) in processes">
+				    		<tr class="row">
+				    			<td class="col"><span v-for="index in _.range(process.inventory)">■</span></td>
+				    			<td class="col">🤖 {{process.capacity}} </td>
+				    			<td class="col red" ><span v-for="index in _.range(process.averageInventory)">■</span></td>
+				    		</tr>
+			    		</tbody>
+			    		<tr class="row">
+							<td class="col"></td>
+							<td class="col">{{production}}</td>
+							<td class="col"></td>
+						</tr>
+			    	</table>
+    			</td>
+    		</tr>
+    	</table>
+    </div>
+  </body>
+  <script src="flows.js"></script>
+</html>

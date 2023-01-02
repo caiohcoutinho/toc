@@ -1,0 +1,17 @@
+.logsArea{
+	overflow-y: scroll;
+	max-height: 150px;
+}
+
+.factory td{
+	word-break: break-all;
+	text-align: center;
+}
+
+.red{
+	color: red;
+}
+
+.green{
+	color: green;
+}
